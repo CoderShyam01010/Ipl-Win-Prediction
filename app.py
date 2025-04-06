@@ -65,14 +65,18 @@ def predict():
 
         # Predict probabilities
         result = pipe.predict_proba(input_df)
+        print(result)
         loss = result[0][0]
         win = result[0][1]
 
         # Return JSON response
         return jsonify({
-            'win_probability': round(win * 100, 2),
-            'lose_probability': round(loss * 100, 2)
-        })
+    'batting_team': batting_team,
+    'bowling_team': bowling_team,
+    'team_1_win_probability': round(win * 100, 2),
+    'team_2_win_probability': round(loss * 100, 2)
+})
+
 
     except Exception as e:
         print("Error in Prediction:", str(e))
