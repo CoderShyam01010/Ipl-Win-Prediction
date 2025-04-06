@@ -83,34 +83,44 @@
 
     <script>
         $(document).ready(function() {
-            $("#predictForm").on("submit", function(e) {
-                e.preventDefault();
-                
-                let data = {
-                    batting_team: $("#batting_team").val(),
-                    bowling_team: $("#bowling_team").val(),
-                    city: $("#city").val(),
-                    target: $("#target").val(),
-                    score: $("#score").val(),
-                    overs: $("#overs").val(),
-                    wickets: $("#wickets").val()
-                };
+    $("#predictForm").on("submit", function(e) {
+        e.preventDefault();
+        
+        let data = {
+            batting_team: $("#batting_team").val(),
+            bowling_team: $("#bowling_team").val(),
+            city: $("#city").val(),
+            target: $("#target").val(),
+            score: $("#score").val(),
+            overs: $("#overs").val(),
+            wickets: $("#wickets").val()
+        };
 
-                $.ajax({
-                    url: "/predict",
-                    type: "POST",
-                    contentType: "application/json",
-                    data: JSON.stringify(data),
-                    success: function(response) {
-                        $("#win_probability").text("Win Probability: " + response.win_probability + "%");
-                        $("#lose_probability").text("Lose Probability: " + response.lose_probability + "%");
-                    },
-                    error: function(xhr) {
-                        alert("Error: " + xhr.responseText);
-                    }
-                });
-            });
+        $.ajax({
+            url: "/predict",
+            type: "POST",
+            contentType: "application/json",
+            data: JSON.stringify(data),
+            success: function(response) {
+                // Destructure the response object to get the necessary data
+                const { batting_team, bowling_team, team_1_win_probability, team_2_win_probability } = response;
+
+                // Determine the winning team and set colors accordingly
+                const isBattingTeamWinner = team_1_win_probability > team_2_win_probability;
+
+                // Update the win probability text and colors
+                $("#win_probability").text(`${isBattingTeamWinner ? batting_team : bowling_team} Win Probability: ${isBattingTeamWinner ? team_1_win_probability : team_2_win_probability}%`)
+                                     .css("color", "green");
+                $("#lose_probability").text(`${isBattingTeamWinner ? bowling_team : batting_team} Win Probability: ${isBattingTeamWinner ? team_2_win_probability : team_1_win_probability}%`)
+                                      .css("color", "red");
+            },
+            error: function(xhr) {
+                alert("Error: " + xhr.responseText);
+            }
         });
+    });
+});
+
     </script>
 </body>
 </html>
